@@ -2,6 +2,9 @@ import express from 'express'
 import 'dotenv/config'
 import connectDB from './database/db.js'
 import authRoute from './routes/authRoute.js'
+import websiteRoute from './routes/websiteRoute.js'
+import paymentRoute from './routes/paymentRoute.js'
+import contactRoute from './routes/contactRoute.js'
 import cookieParser from 'cookie-parser'
 import dns from 'dns';
 import cors from 'cors'
@@ -20,6 +23,9 @@ app.use(cors({
   credentials: true
 }));
 app.use('/api/auth', authRoute)
+app.use('/api/website', websiteRoute)
+app.use('/api/payment', paymentRoute)
+app.use('/api/contact', contactRoute)
 
 
 
