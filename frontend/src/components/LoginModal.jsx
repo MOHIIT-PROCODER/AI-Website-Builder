@@ -7,7 +7,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 
-const LoginModal = ({ open, onClose }) => {
+const LoginModal = ({ open, onClose, onSuccess, message }) => {
     const dispatch = useDispatch()
     const handleGoogleAuth = async () => {
         try {
@@ -20,6 +20,7 @@ const LoginModal = ({ open, onClose }) => {
             }, { withCredentials: true })
             dispatch(setUserData(data))
             onClose()
+            if (onSuccess) onSuccess(data)
         } catch (error) {
             console.log(error)
         }
@@ -72,8 +73,7 @@ className="w-full max-w-md rounded-2xl border border-zinc-800 bg-[#0A0A0A] shado
             </h2>
 
             <p className="mt-3 text-zinc-500">
-              Continue to generate websites and export
-              production-ready React code.
+              {message || "Continue to generate websites and export production-ready React code."}
             </p>
 
           </div>

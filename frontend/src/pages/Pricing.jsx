@@ -1,10 +1,12 @@
-import React from "react";
-import { ArrowLeft, Check, Coins, Sparkles, Zap } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { ArrowLeft, Check, Coins, Sparkles, Zap, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import Navbar from "../components/Navbar";
+import LoginModal from "../components/LoginModal";
 
 const plans = [
   {
@@ -62,8 +64,17 @@ const plans = [
 const Pricing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
-  const handlePayment = async (plan) => {
+  // Login modal state
+  const [showLogin, setShowLogin] = useState(false);
+  // Notification banner state
+  const [loginBanner, setLoginBanner] = useState(false);
+  // Store the plan the guest tried to buy before logging in
+  const pendingPlan = useRef(null);
+
+  /** Actually runs the Razorpay payment flow (called when user is confirmed logged in) */
+  const processPayment = async (plan) => {
     if (plan.id === "free") {
       navigate("/dashboard");
       return;
@@ -110,122 +121,187 @@ const Pricing = () => {
     }
   };
 
+  /** Gate: if not logged in, open login modal and remember the plan */
+  const handlePayment = (plan) => {
+    if (!userData) {
+      pendingPlan.current = plan;
+      setLoginBanner(true);
+      setShowLogin(true);
+      return;
+    }
+    processPayment(plan);
+  };
+
+  /** Called by LoginModal after a successful login */
+  const handleLoginSuccess = () => {
+    setLoginBanner(false);
+    if (pendingPlan.current) {
+      const plan = pendingPlan.current;
+      pendingPlan.current = null;
+      processPayment(plan);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-[#0A0A0A] text-white overflow-hidden">
-      {/* Grid Background */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right,#ffffff 1px,transparent 1px),linear-gradient(to bottom,#ffffff 1px,transparent 1px)",
-          backgroundSize: "60px 60px",
+    <>
+      <Navbar />
+
+      {/* Login Modal — opens when guest tries to buy */}
+      <LoginModal
+        open={showLogin}
+        onClose={() => {
+          setShowLogin(false);
+          setLoginBanner(false);
+          pendingPlan.current = null;
         }}
+        onSuccess={handleLoginSuccess}
+        message="Sign in to continue your purchase."
       />
 
-      {/* Purple Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] sm:w-[700px] h-[400px] bg-purple-700/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-700/8 blur-[120px] pointer-events-none" />
+      <div className="relative min-h-screen bg-[#0A0A0A] text-white overflow-hidden">
+        {/* Grid Background */}
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right,#ffffff 1px,transparent 1px),linear-gradient(to bottom,#ffffff 1px,transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
 
-      <div className="relative z-10 px-4 sm:px-6 py-12">
-        {/* Back Button */}
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white transition mb-14 sm:mb-16"
-        >
-          <ArrowLeft size={18} />
-          Back
-        </button>
+        {/* Purple Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] sm:w-[700px] h-[400px] bg-purple-700/10 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-700/8 blur-[120px] pointer-events-none" />
 
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto text-center mb-16 sm:mb-20"
-        >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 uppercase tracking-widest text-xs mb-6">
-            <Zap size={12} />
-            Pricing
-          </span>
+        <div className="relative z-10 px-4 sm:px-6 py-12 pt-24">
 
-          <h1 className="mt-4 text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight">
-            Build websites
-            <br />
-            <span className="bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
-              with AI
-            </span>
-          </h1>
-
-          <p className="mt-6 text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
-            Generate beautiful websites instantly. Choose a plan and start
-            building today.
-          </p>
-        </motion.div>
-
-        {/* Cards */}
-        <div className="max-w-7xl mx-auto grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.15 }}
-              whileHover={{ y: -8 }}
-              className={`relative rounded-3xl border backdrop-blur-xl p-6 sm:p-8 transition-all ${plan.accent} ${plan.glow}`}
-            >
-              {plan.popular && (
-                <div className="absolute right-5 top-5 px-3 py-1 rounded-full bg-purple-500 text-white text-xs font-semibold">
-                  Most Popular
-                </div>
-              )}
-
-              <h2 className="text-xl sm:text-2xl font-semibold mb-2">{plan.name}</h2>
-              <p className="text-zinc-500 mb-6 sm:mb-8 text-sm">{plan.description}</p>
-
-              <div className="flex items-end gap-2 mb-4 sm:mb-6">
-                <span className="text-4xl sm:text-5xl font-bold">{plan.price}</span>
-                <span className="text-zinc-500 mb-2 text-sm">one-time</span>
-              </div>
-
-              <div className="flex items-center gap-2 mb-6 sm:mb-8 px-3 py-2 rounded-xl bg-white/5 w-fit">
-                <Coins size={16} className="text-yellow-400" />
-                <span className="text-sm font-medium">{plan.credits} Credits</span>
-              </div>
-
-              <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-zinc-300 text-sm">
-                    <span className="w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                      <Check size={11} className="text-emerald-400" />
-                    </span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => handlePayment(plan)}
-                className={`w-full py-3 rounded-xl font-medium transition text-sm sm:text-base ${
-                  plan.popular
-                    ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:opacity-90"
-                    : "bg-white/5 border border-white/10 hover:bg-white/10"
-                }`}
+          {/* ── Login Required Banner ── */}
+          <AnimatePresence>
+            {loginBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-4xl mx-auto mb-8 flex items-center gap-3 px-5 py-3.5 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-200 text-sm"
               >
-                {plan.button}
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
+                <Lock size={15} className="text-purple-400 shrink-0" />
+                <span>
+                  <strong>Sign in required</strong> — Please log in or create an account to complete your purchase.
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        {/* Footer note */}
-        <div className="mt-16 sm:mt-24 text-center">
-          <div className="inline-flex items-center gap-2 text-zinc-500 text-sm">
-            <Sparkles size={14} className="text-purple-400" />
-            Trusted by developers, startups and creators worldwide.
+          {/* Back Button */}
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-zinc-400 hover:text-white transition mb-14 sm:mb-16"
+          >
+            <ArrowLeft size={18} />
+            Back
+          </button>
+
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto text-center mb-16 sm:mb-20"
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 uppercase tracking-widest text-xs mb-6">
+              <Zap size={12} />
+              Pricing
+            </span>
+
+            <h1 className="mt-4 text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight">
+              Build websites
+              <br />
+              <span className="bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+                with AI
+              </span>
+            </h1>
+
+            <p className="mt-6 text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto">
+              Generate beautiful websites instantly. Choose a plan and start
+              building today.
+            </p>
+          </motion.div>
+
+          {/* Cards */}
+          <div className="max-w-7xl mx-auto grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.15 }}
+                whileHover={{ y: -8 }}
+                className={`relative rounded-3xl border backdrop-blur-xl p-6 sm:p-8 transition-all ${plan.accent} ${plan.glow}`}
+              >
+                {plan.popular && (
+                  <div className="absolute right-5 top-5 px-3 py-1 rounded-full bg-purple-500 text-white text-xs font-semibold">
+                    Most Popular
+                  </div>
+                )}
+
+                <h2 className="text-xl sm:text-2xl font-semibold mb-2">{plan.name}</h2>
+                <p className="text-zinc-500 mb-6 sm:mb-8 text-sm">{plan.description}</p>
+
+                <div className="flex items-end gap-2 mb-4 sm:mb-6">
+                  <span className="text-4xl sm:text-5xl font-bold">{plan.price}</span>
+                  <span className="text-zinc-500 mb-2 text-sm">one-time</span>
+                </div>
+
+                <div className="flex items-center gap-2 mb-6 sm:mb-8 px-3 py-2 rounded-xl bg-white/5 w-fit">
+                  <Coins size={16} className="text-yellow-400" />
+                  <span className="text-sm font-medium">{plan.credits} Credits</span>
+                </div>
+
+                <ul className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-3 text-zinc-300 text-sm">
+                      <span className="w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                        <Check size={11} className="text-emerald-400" />
+                      </span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => handlePayment(plan)}
+                  className={`w-full py-3 rounded-xl font-medium transition text-sm sm:text-base flex items-center justify-center gap-2 ${
+                    plan.popular
+                      ? "bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:opacity-90"
+                      : "bg-white/5 border border-white/10 hover:bg-white/10"
+                  }`}
+                >
+                  {!userData && plan.id !== "free" && (
+                    <Lock size={14} className="opacity-60" />
+                  )}
+                  {plan.button}
+                </motion.button>
+
+                {/* Subtle "login required" hint for guests */}
+                {!userData && plan.id !== "free" && (
+                  <p className="text-center text-xs text-zinc-600 mt-3">
+                    Login required to purchase
+                  </p>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Footer note */}
+          <div className="mt-16 sm:mt-24 text-center">
+            <div className="inline-flex items-center gap-2 text-zinc-500 text-sm">
+              <Sparkles size={14} className="text-purple-400" />
+              Trusted by developers, startups and creators worldwide.
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
