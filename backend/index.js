@@ -1,0 +1,30 @@
+import express from 'express'
+import 'dotenv/config'
+import connectDB from './database/db.js'
+import authRoute from './routes/authRoute.js'
+import cookieParser from 'cookie-parser'
+import dns from 'dns';
+import cors from 'cors'
+
+//change dns
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
+const app =express() //create app
+const PORT= process.env.PORT || 3000
+
+//middleware
+app.use(express.json())
+app.use(cookieParser())
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+app.use('/api/auth', authRoute)
+
+
+
+// for listen server we need two things, port and callback function
+app.listen(PORT, ()=>{
+  connectDB()
+  console.log("server is listening at port:" + PORT);
+})
