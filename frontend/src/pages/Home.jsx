@@ -149,7 +149,7 @@ function DemoModal({ onClose }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center sm:p-4"
         onClick={onClose}
       >
         <motion.div
@@ -159,10 +159,10 @@ function DemoModal({ onClose }) {
           exit={{ opacity: 0, scale: 0.92, y: 30 }}
           transition={{ type: "spring", damping: 24, stiffness: 260 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-2xl bg-[#0d0d0d] border border-white/10 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(139,92,246,0.2)]"
+          className="relative w-full max-w-2xl bg-[#0d0d0d] border border-white/10 rounded-t-3xl sm:rounded-3xl shadow-[0_0_80px_rgba(139,92,246,0.2)] flex flex-col max-h-[90vh]"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+          {/* Sticky Header — always visible, never scrolls away */}
+          <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-white/10 bg-[#0d0d0d] rounded-t-3xl shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
                 <Play size={14} className="text-purple-400 ml-0.5" />
@@ -172,16 +172,18 @@ function DemoModal({ onClose }) {
                 <p className="text-xs text-zinc-500">5-step process from idea to live website</p>
               </div>
             </div>
+            {/* Close / Back button — always visible on mobile */}
             <button
               onClick={onClose}
               className="p-2 rounded-xl hover:bg-white/10 transition text-zinc-400 hover:text-white"
+              aria-label="Close"
             >
               <X size={20} />
             </button>
           </div>
 
-          {/* Steps */}
-          <div className="p-6 space-y-4">
+          {/* Scrollable Steps */}
+          <div className="overflow-y-auto flex-1 p-6 space-y-4">
             {DEMO_STEPS.map((step, i) => (
               <motion.div
                 key={i}
@@ -214,8 +216,8 @@ function DemoModal({ onClose }) {
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="px-6 pb-6">
+          {/* Sticky CTA at bottom */}
+          <div className="px-6 pb-6 pt-3 shrink-0 border-t border-white/10 bg-[#0d0d0d]">
             <button
               onClick={onClose}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold hover:opacity-90 transition text-sm"
@@ -226,6 +228,7 @@ function DemoModal({ onClose }) {
         </motion.div>
       </motion.div>
     </AnimatePresence>
+
   );
 }
 
