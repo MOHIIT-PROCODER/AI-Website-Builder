@@ -206,9 +206,9 @@ function DemoModal({ onClose }) {
                 <div className="pt-1.5">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] text-purple-400 font-mono">0{i + 1}</span>
-                    <h3 className="font-semibold text-sm">{step.title}</h3>
+                    <h3 className="font-semibold text-sm text-white">{step.title}</h3>
                   </div>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
+                  <p className="text-zinc-300 text-sm leading-relaxed">{step.desc}</p>
                 </div>
 
                 <CheckCircle size={16} className="text-emerald-400 shrink-0 mt-2 opacity-0 group-hover:opacity-100 transition ml-auto" />
