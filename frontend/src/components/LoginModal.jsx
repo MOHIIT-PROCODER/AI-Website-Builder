@@ -59,7 +59,7 @@ className="w-full max-w-md rounded-2xl border border-zinc-800 bg-[#0A0A0A] shado
               <img
                 src="/logo.png"
                 alt="logo"
-                className="w-9 h-9"
+                className="w-9 h-9 rounded-full object-cover"
               />
 
               <span className="text-white font-semibold text-lg">

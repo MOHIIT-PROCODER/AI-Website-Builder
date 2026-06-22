@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- App title & description -->
+    <title>Mohit AI - AI Website Builder</title>
+    <meta name="description" content="Build stunning AI-powered websites from a single prompt. Generate, edit and deploy in seconds." />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme colors -->
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="background-color" content="#0A0A0A" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Apple / iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Mohit AI" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="shortcut icon" href="/icon-192.png" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mohit AI - AI Website Builder" />
+    <meta property="og:description" content="Build stunning websites from a single prompt using AI." />
+    <meta property="og:image" content="/icon-512.png" />
+
+    <!-- Microsoft / Windows -->
+    <meta name="msapplication-TileColor" content="#7c3aed" />
+    <meta name="msapplication-TileImage" content="/icon-192.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Register Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("✅ Service Worker registered:", reg.scope))
+            .catch((err) => console.log("❌ SW registration failed:", err));
+        });
+      }
+    </script>
+  </body>
+</html>

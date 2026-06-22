@@ -19,7 +19,7 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 open frontend 
-cd frontend/"AI Website Builder"
+cd frontend
 npm run dev
 
 open backend
