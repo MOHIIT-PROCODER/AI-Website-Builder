@@ -324,9 +324,9 @@ const Home = () => {
 
                   <button
                     onClick={() => setShowDemo(true)}
-                    className="px-6 py-3 border border-zinc-700 rounded-xl hover:bg-white/5 hover:border-purple-500/40 transition flex items-center gap-2 text-zinc-300"
+                    className="px-6 py-3 bg-white text-black rounded-xl font-medium flex items-center gap-2 hover:bg-zinc-200 transition"
                   >
-                    <Play size={15} className="text-purple-400" />
+                    <Play size={15} className="text-purple-600" />
                     View Demo
                   </button>
                 </div>
