@@ -1,0 +1,62 @@
+# ============================================================
+#  ROOT .gitignore — AI Website Builder
+# ============================================================
+
+# ----- Environment & Secrets --------------------------------
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.test
+!.env.example          # allow example/template env files
+
+# ----- Node.js / npm / yarn ---------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json.bak
+
+# ----- Build Output -----------------------------------------
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# ----- Logs -------------------------------------------------
+logs/
+*.log
+
+# ----- OS Files ---------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ----- Editor / IDE -----------------------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# ----- Temp / Cache -----------------------------------------
+.cache/
+.temp/
+.tmp/
+*.local
+
+# ----- Firebase ---------------------------------------------
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
