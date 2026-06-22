@@ -5,7 +5,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
+import LoginModal from "../components/LoginModal";
 
 // ── Animated code preview data ──────────────────────────────────────────────
 const CODE_LINES = [
@@ -231,6 +233,16 @@ function DemoModal({ onClose }) {
 const Home = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const { userData } = useSelector((state) => state.user);
+
+  const handleStartBuilding = () => {
+    if (userData) {
+      navigate("/generate");
+    } else {
+      setShowLogin(true);
+    }
+  };
 
   return (
     <>
@@ -238,6 +250,9 @@ const Home = () => {
 
       {/* Demo Modal */}
       {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+
+      {/* Login Modal */}
+      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
 
       <main className="min-h-screen bg-[#0A0A0A] text-white relative overflow-hidden">
 
@@ -297,7 +312,7 @@ const Home = () => {
 
                 <div className="flex flex-wrap gap-4 mt-8 sm:mt-10">
                   <button
-                    onClick={() => navigate("/generate")}
+                    onClick={handleStartBuilding}
                     className="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl font-medium flex items-center gap-2 hover:opacity-90 transition shadow-[0_0_30px_rgba(139,92,246,0.3)]"
                   >
                     Start Building
@@ -470,7 +485,7 @@ const Home = () => {
                 Join thousands of creators and developers using Mohit AI to ship faster.
               </p>
               <button
-                onClick={() => navigate("/generate")}
+                onClick={handleStartBuilding}
                 className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold hover:opacity-90 transition shadow-[0_0_30px_rgba(139,92,246,0.3)]"
               >
                 Start Building for Free 🚀

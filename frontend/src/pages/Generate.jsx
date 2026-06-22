@@ -34,6 +34,13 @@ const Generate = () => {
 
   const { userData } = useSelector((state) => state.user);
 
+  // Redirect to home if not logged in
+  useEffect(() => {
+    if (!userData) {
+      navigate("/");
+    }
+  }, [userData, navigate]);
+
   const handleGenerateWebsite = async () => {
     try {
       setLoading(true);
